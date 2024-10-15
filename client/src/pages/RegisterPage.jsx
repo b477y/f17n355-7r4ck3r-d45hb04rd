@@ -57,7 +57,7 @@ const RegisterPage = () => {
       }
 
       login(data.email, data.token);
-      navigate("/");
+      navigate("/health-form"); // Redirect to HealthForm after successful registration
     } catch (err) {
       setError("Error occurred while registering.");
     }
