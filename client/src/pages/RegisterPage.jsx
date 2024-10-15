@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Button, TextField, Typography, Box, Container, Link } from "@mui/material/";
+=======
+import { Button, TextField, Typography, Box, Container } from "@mui/material/";
+>>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/Auth/AuthContext";
@@ -57,31 +61,47 @@ const RegisterPage = () => {
       }
 
       login(data.email, data.token);
+<<<<<<< HEAD
       navigate("/");
+=======
+      navigate("/health-form"); // Redirect to HealthForm after successful registration
+>>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
     } catch (err) {
       setError("Error occurred while registering.");
     }
   };
 
   return (
+<<<<<<< HEAD
     <Container maxWidth="xs" sx={{ backgroundColor: "#f0f4f8", borderRadius: "8px", boxShadow: 3, padding: 4, mt: 8 }}>
+=======
+    <Container>
+>>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+<<<<<<< HEAD
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
           Create Your Account
         </Typography>
+=======
+          mt: 2,
+        }}
+      >
+        <Typography variant="h6">Create Your Account</Typography>
+>>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             mt: 2,
             gap: 2,
+<<<<<<< HEAD
           }}
         >
           <TextField
@@ -100,11 +120,21 @@ const RegisterPage = () => {
             variant="outlined"
             sx={{ borderRadius: 4 }}
           />
+=======
+            padding: 2,
+            border: 1,
+            borderColor: "#f5f5f5",
+          }}
+        >
+          <TextField inputRef={nameRef} label="Name" name="name" />
+          <TextField inputRef={emailRef} label="Email" name="email" />
+>>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
           <TextField
             inputRef={passwordRef}
             label="Password"
             name="password"
             type="password"
+<<<<<<< HEAD
             fullWidth
             variant="outlined"
             sx={{ borderRadius: 4 }}
@@ -118,6 +148,14 @@ const RegisterPage = () => {
           Already have an account? 
           <Link href="/login" sx={{ ml: 1, color: "#1a237e", fontWeight: 600 }}>Login Now</Link>
         </Typography>
+=======
+          />
+          <Button onClick={onSubmit} variant="contained">
+            Register
+          </Button>
+          {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
+        </Box>
+>>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
       </Box>
     </Container>
   );
