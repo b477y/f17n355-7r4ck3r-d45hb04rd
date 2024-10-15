@@ -4,14 +4,11 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-<<<<<<< HEAD
-    "server": "nodemon backend/server.js",
-    "client": "npm start --prefix frontend",
-=======
-    "server": "nodemon servery/server.js",
+    "start": "node server/server.js",
+
+    "server": "nodemon server/server.js",
     "client": "npm start --prefix client",
->>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
+
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
@@ -27,10 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.0",
     "nodemailer": "^6.9.15",
-<<<<<<< HEAD
     "nodemon": "^3.1.7",
-=======
->>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {

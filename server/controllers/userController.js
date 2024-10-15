@@ -67,32 +67,21 @@ const register = async (req, res) => {
 const logout = (req, res) => {
   res.cookie("jwt", "", {
     httpOnly: true,
-    expires: new Date(0), // حذف الكوكي
+    expires: new Date(0), // Delete the cookie
   });
 
   res.status(200).json({ message: "User logged out successfully" });
 };
 
-
-
 // Get current user's profile
 // GET request: /profile
 const profileUser = async (req, res) => {
   try {
-<<<<<<< HEAD
     // Assuming you have a middleware that sets `req.user`
-=======
->>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
     const user = {
       _id: req.user._id,
       name: req.user.name,
       email: req.user.email,
-<<<<<<< HEAD
-    };
-
-    res.status(200).json(user);
-  } catch (error) {
-=======
       age: req.user.age,
       weight: req.user.weight,
       height: req.user.height,
@@ -100,19 +89,15 @@ const profileUser = async (req, res) => {
       waterDrank: req.user.waterDrank,
       caloriesToBurn: req.user.caloriesToBurn,
     };
-console.log(user);
+
+    console.log(user);
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching profile:", error);
->>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 84b5a4ea1303b242e9d79b0fd76684373fd36765
 // Update user profile
 // PUT request: /profile/update
 const updateUser = async (req, res) => {  
