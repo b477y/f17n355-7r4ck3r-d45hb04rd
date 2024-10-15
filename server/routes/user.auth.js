@@ -5,7 +5,7 @@ import {
   profileUser,
   updateUser,
 } from "../controllers/userController.js";
-import { protact } from "../middleware/authmiddleware.js";
+import { protect } from "../middleware/authmiddleware.js";
 import express from "express";
 
 const router = express.Router();
@@ -13,7 +13,8 @@ const router = express.Router();
 router.post("/login", login);
 router.post("/register", register);
 router.post("/logout", logout);
-router.route("/profile").get(protact, profileUser).put(protact, updateUser);
+router.get('/profile', protect, profileUser); // Protecting the profile route
+router.put('/profile/update', protect, updateUser);
 
 
 export default router;

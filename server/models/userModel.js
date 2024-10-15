@@ -8,34 +8,25 @@ const userSchema = mongoose.Schema(
       trim: true,
       required: [true, "name required"],
     },
-
     email: {
       type: String,
       required: [true, "email required"],
       unique: true,
       lowercase: true,
     },
-
-    age: Number,
-    weight: Number,
-    waterGoal: Number,
-    height: Number,
-    caloriesToBurn: Number,
-    waterDrank: Number,
     password: {
       type: String,
       required: [true, "password required"],
       minLength: [6, "too short password"],
     },
-
-    passwordChangedAt: Date,
-    passwordResetCode: String,
-    passwordResetExpires: Date,
-    passwordResetVerified: Boolean,
-
     active: {
       type: Boolean,
       default: true,
+    },
+    // Reference to the UserInfo model
+    userInfo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserInfo", // Referencing the UserInfo model
     },
   },
   { timestamps: true }
@@ -44,7 +35,6 @@ const userSchema = mongoose.Schema(
 // Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
