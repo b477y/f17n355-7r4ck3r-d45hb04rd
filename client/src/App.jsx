@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
+import AuthProvider from "./context/Auth/AuthProvider";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useAuth } from "./context/Auth/AuthContext"; // Import useAuth
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Protected home page route */}
+          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+          
+          {/* Redirect to home if already authenticated */}
+          <Route 
+            path="/register" 
+            element={<RedirectToHome path="/register" />} 
+          />
+          <Route 
+            path="/login" 
+            element={<RedirectToHome path="/login" />} 
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
 }
 
-export default App
+const RedirectToHome = ({ path }) => {
+  const { isAuthenticated } = useAuth(); // Get isAuthenticated from context
+
+  return isAuthenticated ? <Navigate to="/" /> : (path === "/register" ? <RegisterPage /> : <LoginPage />);
+};
+
+export default App;

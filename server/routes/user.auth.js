@@ -1,12 +1,18 @@
+import {
+  login,
+  register,
+  logout,
+  profileUser,
+  updateUser,
+} from "../controllers/userController.js";
+import { protact } from "../middleware/authmiddleware.js";
 import express from "express";
-import { authUser, registerUser, Logout, profileUser, updaterUser } from "../controllers/userController.js";
-import {protact} from "../middleware/authmiddleware.js";
 
 const router = express.Router();
 
-router.post("/auth",authUser);
-router.post("/register",registerUser);
-router.post("/logout",Logout);
-router.route("/profile").get(protact,profileUser).put(protact,updaterUser);
+router.post("/login", login);
+router.post("/register", register);
+router.post("/logout", logout);
+// router.route("/profile").get(protact, profileUser).put(protact, updaterUser);
 
 export default router;
