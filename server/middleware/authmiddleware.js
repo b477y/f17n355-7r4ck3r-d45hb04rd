@@ -13,13 +13,18 @@ const protact = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-    req.user = await User.findById(decoded.userid).select("-password");
+    req.user = await User.findById(decoded.userId).select("-password");
 
-    next(); // Call the next middleware or controller
+    if (!req.user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    next(); // Proceed to the next middleware or controller
   } catch (err) {
     console.error(err); // Log the actual error for debugging
     return res.status(401).send({ error: "Not authorized, token failed" });
   }
 };
+
 
 export { protact };

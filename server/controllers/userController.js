@@ -79,18 +79,25 @@ const logout = (req, res) => {
 // GET request: /profile
 const profileUser = async (req, res) => {
   try {
-    // Assuming you have a middleware that sets `req.user`
     const user = {
       _id: req.user._id,
       name: req.user.name,
       email: req.user.email,
+      age: req.user.age,
+      weight: req.user.weight,
+      height: req.user.height,
+      waterGoal: req.user.waterGoal,
+      waterDrank: req.user.waterDrank,
+      caloriesToBurn: req.user.caloriesToBurn,
     };
-
+console.log(user);
     res.status(200).json(user);
   } catch (error) {
+    console.error("Error fetching profile:", error);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
+
 
 // Update user profile
 // PUT request: /profile/update

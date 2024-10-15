@@ -17,9 +17,16 @@ const userSchema = mongoose.Schema(
           lowercase: true
       },
   
-      phone: String,
+      age: Number,
+      weight: Number,
+      height: Number,
+      waterGoal: Number,
+      waterDrank: {
+        type: Number,
+        default: 0
+      },
+      caloriesToBurn: Number,
   
-      profileImage: String,
   
       password: {
           type: String,
@@ -31,11 +38,7 @@ const userSchema = mongoose.Schema(
       passwordResetExpires: String,
       passwordResetVerified: Boolean
       ,
-      role: {
-          type: String,
-          enum: ['user', 'admin'],
-          default: 'user'
-      },
+     
   
       active: {
           type: Boolean,
