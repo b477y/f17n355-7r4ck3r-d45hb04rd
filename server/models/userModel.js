@@ -14,6 +14,16 @@ const userSchema = mongoose.Schema(
       unique: true,
       lowercase: true,
     },
+    passwordChangedAt: Date,
+    passwordResetCode: String,
+    passwordResetExpires: String,
+    passwordResetVerified: Boolean
+    ,
+    role: {
+        type: String,
+        enum: ['user', 'manager', 'admin'],
+        default: 'user'
+    },
     password: {
       type: String,
       required: [true, "password required"],
@@ -24,7 +34,7 @@ const userSchema = mongoose.Schema(
       default: true,
     },
     // Reference to the UserInfo model
-    userInfo: {
+     userInfo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserInfo", // Referencing the UserInfo model
     },

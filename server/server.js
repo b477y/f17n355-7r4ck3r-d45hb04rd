@@ -4,12 +4,15 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.auth.js";
 import userInfoRoutes from './routes/userInfoRoutes.js';
 import cors from "cors";
-
+import globalError from "./middleware/errormiddleware.js";
 import dbConnection from "./config/db.js";
+
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;
+
+dbConnection();
 
 app.use(
   cors({
@@ -23,7 +26,7 @@ app.use(cookieParser());
 app.use("/", userRoutes);
 app.use('/api/userinfo', userInfoRoutes);
 
-dbConnection();
+app.use(globalError);
 
 app.listen(port, () => {
   console.log(`app listening on port ${port}`);
