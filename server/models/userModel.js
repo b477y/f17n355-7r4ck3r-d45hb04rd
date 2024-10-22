@@ -29,6 +29,12 @@ const userSchema = mongoose.Schema(
       required: [true, "password required"],
       minLength: [6, "too short password"],
     },
+    workouts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Workout', // Refers to the Workout model
+    }
+  ],
     active: {
       type: Boolean,
       default: true,

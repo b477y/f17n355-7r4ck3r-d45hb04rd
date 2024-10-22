@@ -1,4 +1,23 @@
 import UserInfo from "../models/userInfo.js";
+import { v4 as uuidv4 } from 'uuid';
+import { uploadUserImage } from '../middleware/uploadimageMiddleware.js'
+import sharp from 'sharp';
+import asyncHandler from 'express-async-handler'
+
+// upload single image
+const uploadUserImage1 = uploadUserImage("profileImage");
+
+// image processing
+const resizeImage = asyncHandler(async (req, res, next) => { 
+    
+    const filename = `user-${uuidv4()}-${Date.now()}.jpeg`
+    if (req.file) {
+        await sharp(req.file.buffer).resize(600, 600).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`uploads/users/${filename}`);
+        req.body.profileImage = filename;
+    }  
+    next();
+})
+
 
 const createUserInfo = async (req, res) => {
   try {
@@ -55,4 +74,4 @@ const updateUserInfo = async (req, res) => {
   }
 };
 
-export { createUserInfo, getUserInfo, updateUserInfo };
+export { createUserInfo, getUserInfo, updateUserInfo, uploadUserImage, resizeImage };
