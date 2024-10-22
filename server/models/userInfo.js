@@ -31,6 +31,7 @@ const userInfoSchema = mongoose.Schema(
       type: Number,
       required: [true, "waterDrank required"],
     },
+    profileImage: String,
   },
   { timestamps: true }
 );

@@ -6,6 +6,7 @@ import userInfoRoutes from './routes/userInfoRoutes.js';
 import cors from "cors";
 import globalError from "./middleware/errormiddleware.js";
 import dbConnection from "./config/db.js";
+import  workoutRoute  from "./routes/workoutRoute.js"
 
 dotenv.config();
 
@@ -25,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use("/", userRoutes);
 app.use('/api/userinfo', userInfoRoutes);
-
+app.use('/workout', workoutRoute);
 app.use(globalError);
 
 app.listen(port, () => {

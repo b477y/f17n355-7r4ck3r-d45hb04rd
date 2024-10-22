@@ -4,7 +4,10 @@ import generateToken from "../utils/generateToken.js";
 import crypto from "crypto";
 import sendEmail from "../utils/nodemailer.js";
 import ApiError from "../utils/ApiError.js";
-import asyncHandler from "express-async-handler"
+import asyncHandler from "express-async-handler";
+
+
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -174,4 +177,13 @@ const resetPassword = async (req, res, next) => {
     res.status(200).json({ data: user, token });
 }
 
-export { login, register, logout, profileUser, updateUser, forgetPassword, verifyPassResetCode, resetPassword };
+const allowedTo = (...roles) => 
+    asyncHandler(async (req, res, next) => {
+        //1- check user role
+        if (!(roles.includes(req.user.role)))
+            return next(new ApiError('You have no permission to perform this action', 403));
+
+        next();
+    })
+
+export { login, register, logout, profileUser, updateUser, forgetPassword, verifyPassResetCode, resetPassword, allowedTo };
