@@ -42,7 +42,7 @@ const createUserInfo = async (req, res) => {
 
 const getUserInfo = async (req, res) => {
   try {
-    const userInfo = await UserInfo.findOne({ user: req.params.userId });
+    const userInfo = await UserInfo.findOne({ user: req.params.userId }).populate('Workout');
 
     if (!userInfo) {
       return res.status(404).json({ message: 'User Info not found' });
