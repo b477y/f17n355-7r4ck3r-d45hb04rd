@@ -5,7 +5,8 @@ import userRoutes from "./routes/user.auth.js";
 import userInfoRoutes from './routes/userInfoRoutes.js';
 import cors from "cors";
 import dbConnection from "./config/db.js";
-import  workoutRoute  from "./routes/workoutRoute.js"
+import workoutRoute from "./routes/workoutRoute.js";
+import globalError from "./middleware/errormiddleware.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use("/", userRoutes);
 app.use('/api/userinfo', userInfoRoutes);
 app.use('/workout', workoutRoute);
 
+app.use(globalError)
 
 app.listen(port, () => {
   console.log(`app listening on port ${port}`);
