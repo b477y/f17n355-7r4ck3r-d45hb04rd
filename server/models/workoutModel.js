@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { type } from 'os';
 
 const workoutSchema = new mongoose.Schema({
     user: {
@@ -11,8 +12,8 @@ const workoutSchema = new mongoose.Schema({
         name: { type: String, required: true },
         sets: { type: Number, required: true },
         reps: { type: Number, required: true },
-        duration: { type: Number },
-        caloriesBurned: { type: Number, required: true }, 
+        duration: { type: Number, required: true },
+        caloriesBurned: {type: Number, required: true }
         }
         
     ],
