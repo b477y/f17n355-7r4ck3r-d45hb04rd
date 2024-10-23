@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
+import HealthForm from "./pages/HealthForm";
 import AuthProvider from "./context/Auth/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/Auth/AuthContext"; // Access authentication state

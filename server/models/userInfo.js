@@ -9,7 +9,6 @@ const userInfoSchema = mongoose.Schema(
     },
     age: {
       type: Number,
-      required: [true, "age required"],
     },
     weight: {
       type: Number,
@@ -27,9 +26,11 @@ const userInfoSchema = mongoose.Schema(
       type: Number,
       required: [true, "caloriesToBurn required"],
     },
+    caloriesBurned: {
+      type: Number,
+    },
     waterDrank: {
       type: Number,
-      required: [true, "waterDrank required"],
     },
     profileImage: String,
   },

@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import BASE_URL from '../constants/baseUrl';
+import React, { useState } from "react";
+import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import BASE_URL from "../constants/baseUrl";
 
 const HealthForm = () => {
   const navigate = useNavigate();
 
   // State for form inputs
   const [formData, setFormData] = useState({
-    waterGoal: '',
-    waterDrank: '',
-    caloriesBurned: '',
-    age: '',
-    weight: '',
-    height: '',
+    waterGoal: "",
+    caloriesToBurn: "",
+    age: "",
+    weight: "",
+    height: "",
   });
 
   const handleChange = (e) => {
@@ -26,24 +25,29 @@ const HealthForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Assuming the token is stored in localStorage
+    const token = localStorage.getItem("token");
+
     try {
-      const response = await fetch(`${BASE_URL}/api/health`, {
-        method: 'POST',
+      const response = await fetch(`${BASE_URL}/api/userinfo`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Set the token in the Authorization header
         },
-        body: JSON.stringify(formData),
-        credentials: 'include', // include cookies
+        body: JSON.stringify(formData), // Send the form data without the token in the body
+        credentials: "include", // include cookies
       });
 
       if (response.ok) {
         // Navigate to another page if submission is successful
-        navigate('/dashboard');
+        navigate("/");
       } else {
-        console.error('Failed to submit data.');
+        const errorData = await response.json();
+        console.error("Failed to submit data:", errorData);
       }
     } catch (err) {
-      console.error('An error occurred:', err);
+      console.error("An error occurred:", err);
     }
   };
 
@@ -64,18 +68,9 @@ const HealthForm = () => {
             required
           />
           <TextField
-            label="Water Drank (cups)"
-            name="waterDrank"
-            value={formData.waterDrank}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Calories Burned"
-            name="caloriesBurned"
-            value={formData.caloriesBurned}
+            label="Calories To Burn"
+            name="caloriesToBurn"
+            value={formData.caloriesToBurn}
             onChange={handleChange}
             fullWidth
             margin="normal"
