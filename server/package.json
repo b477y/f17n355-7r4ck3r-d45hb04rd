@@ -1,13 +1,10 @@
 {
-  "name": "fitness-zeft",
+  "name": "server",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "server": "nodemon server/server.js",
-    "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "nodemon server/server.js"
   },
   "keywords": [],
   "author": "",
@@ -22,9 +19,12 @@
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.1",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.15",
     "nodemon": "^3.1.7",
-    "react-router-dom": "^6.26.2"
+    "react-router-dom": "^6.26.2",
+    "sharp": "^0.33.5",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"
