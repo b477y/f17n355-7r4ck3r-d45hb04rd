@@ -59,7 +59,7 @@ const HealthForm = () => {
         </Typography>
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Water Goal (liters)"
+            label="Water Goal (cups)"
             name="waterGoal"
             value={formData.waterGoal}
             onChange={handleChange}

@@ -24,8 +24,6 @@ const resizeImage = asyncHandler(async (req, res, next) => {
 // Controller function to create user info
 const createUserInfo = async (req, res) => {
   try {
-    console.log("Request body:", req.body); // Log the request body for debugging
-
     const {
       age,
       weight,
@@ -36,12 +34,10 @@ const createUserInfo = async (req, res) => {
       caloriesBurned,
     } = req.body;
 
-    // Use the user ID from the request object set by the middleware
-    const userId = req.user._id;
+    const userId = req.user._id; // Use the user ID from the request object
 
-    // Create the user info record in the database
     const userInfo = await UserInfo.create({
-      user: userId, // Use the userId from the middleware
+      user: userId,
       age,
       weight,
       waterGoal,
@@ -51,29 +47,28 @@ const createUserInfo = async (req, res) => {
       caloriesBurned,
     });
 
-    // Send a response with the created user info
-    res.status(201).json(userInfo);
+    res.status(201).json(userInfo); // Send a response with the created user info
   } catch (error) {
-    console.error("Error creating user info:", error); // Log any errors
-    res.status(500).json({ message: "Server error. Please try again later." }); // Send server error response
+    console.error("Error creating user info:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
 // Controller function to get user info
 const getUserInfo = async (req, res) => {
   try {
-    const userInfo = await UserInfo.findOne({
-      user: req.params.userId,
-    }).populate("Workout"); // Populate associated workout data
+    const userInfo = await UserInfo.findOne({ user: req.user._id }).populate(
+      "Workout"
+    );
 
     if (!userInfo) {
-      return res.status(404).json({ message: "User Info not found" }); // Handle not found case
+      return res.status(404).json({ message: "User Info not found" });
     }
 
-    res.status(200).json(userInfo); // Send the user info
+    res.status(200).json(userInfo); // Return the user info
   } catch (error) {
-    console.error("Error fetching user info:", error); // Log any errors
-    res.status(500).json({ message: "Server error. Please try again later." }); // Send server error response
+    console.error("Error fetching user info:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
@@ -81,19 +76,73 @@ const getUserInfo = async (req, res) => {
 const updateUserInfo = async (req, res) => {
   try {
     const userInfo = await UserInfo.findOneAndUpdate(
-      { user: req.params.userId }, // Find user info by user ID
-      req.body, // Update with request body
-      { new: true, runValidators: true } // Return the updated document
+      { user: req.user._id },
+      req.body,
+      { new: true, runValidators: true }
     );
 
     if (!userInfo) {
-      return res.status(404).json({ message: "User Info not found" }); // Handle not found case
+      return res.status(404).json({ message: "User Info not found" });
     }
 
-    res.status(200).json(userInfo); // Send the updated user info
+    res.status(200).json(userInfo); // Return the updated user info
   } catch (error) {
-    console.error("Error updating user info:", error); // Log any errors
-    res.status(500).json({ message: "Server error. Please try again later." }); // Send server error response
+    console.error("Error updating user info:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
+  }
+};
+
+// Controller function to update water intake
+const updateWaterIntake = async (req, res) => {
+  const userId = req.user._id; // Access user ID from the request
+  const { cups } = req.body; // Get the cups value from the request body
+
+  try {
+    const userInfo = await UserInfo.findOneAndUpdate(
+      { user: userId },
+      { $inc: { waterDrank: cups } }, // Increment the waterDrank by cups
+      { new: true }
+    );
+
+    if (!userInfo) {
+      return res.status(404).json({ message: "User information not found." });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Water intake updated successfully.", userInfo }); // Return success message with user info
+  } catch (error) {
+    console.error("Error updating water intake:", error);
+    res.status(500).json({ message: "Error updating water intake.", error });
+  }
+};
+
+// New function to increment water intake by 1 cup
+const incrementWaterIntake = async (req, res) => {
+  req.body.cups = 1; // Automatically set cups to 1 for incrementing
+  return updateWaterIntake(req, res); // Call the controller function to handle the update
+};
+
+// Controller function to get water data
+const getWaterData = async (req, res) => {
+  const userId = req.user._id; // Access user ID from the request
+  console.log("Fetching water data for user ID:", userId); // Log the user ID
+
+  try {
+    const userInfo = await UserInfo.findOne({ user: userId });
+
+    if (!userInfo) {
+      return res.status(404).json({ message: "User information not found." });
+    }
+
+    // Return waterDrank and waterGoal
+    res.status(200).json({
+      waterDrank: userInfo.waterDrank || 0, // Ensure it defaults to 0 if undefined
+      waterGoal: userInfo.waterGoal || 0, // Ensure it defaults to 0 if undefined
+    });
+  } catch (error) {
+    console.error("Error fetching water data:", error);
+    res.status(500).json({ message: "Error fetching water data.", error });
   }
 };
 
@@ -104,4 +153,7 @@ export {
   updateUserInfo,
   uploadUserImage1 as uploadUserImage,
   resizeImage,
+  updateWaterIntake,
+  getWaterData,
+  incrementWaterIntake, // Export the increment function
 };
