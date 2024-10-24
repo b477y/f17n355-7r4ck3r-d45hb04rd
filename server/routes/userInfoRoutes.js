@@ -7,6 +7,7 @@ import {
   resizeImage,
   getWaterData,
   updateWaterIntake,
+  getCaloriesData,
 } from "../controllers/userInfoController.js";
 import { protect } from "../middleware/authmiddleware.js";
 
@@ -26,5 +27,8 @@ router.put("/increment-cups", protect, (req, res) => {
 
 // Route to get water data
 router.get("/water-data", protect, getWaterData);
+
+// New route to get burned calories and calorie goal
+router.get("/calories-data", protect, getCaloriesData); // New route
 
 export default router;

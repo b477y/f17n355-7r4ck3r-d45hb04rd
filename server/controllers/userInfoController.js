@@ -146,6 +146,27 @@ const getWaterData = async (req, res) => {
   }
 };
 
+// Controller function to get calories burned and burning goal
+const getCaloriesData = async (req, res) => {
+  const userId = req.user._id; // Access user ID from the request
+  try {
+    const userInfo = await UserInfo.findOne({ user: userId });
+
+    if (!userInfo) {
+      return res.status(404).json({ message: "User information not found." });
+    }
+
+    // Return caloriesBurned and caloriesToBurn
+    res.status(200).json({
+      caloriesBurned: userInfo.caloriesBurned || 0, // Ensure default value is 0 if undefined
+      caloriesToBurn: userInfo.caloriesToBurn || 0, // Ensure default value is 0 if undefined
+    });
+  } catch (error) {
+    console.error("Error fetching calories data:", error);
+    res.status(500).json({ message: "Error fetching calories data.", error });
+  }
+};
+
 // Export the controller functions
 export {
   createUserInfo,
@@ -156,4 +177,5 @@ export {
   updateWaterIntake,
   getWaterData,
   incrementWaterIntake, // Export the increment function
+  getCaloriesData, // Export the new function
 };

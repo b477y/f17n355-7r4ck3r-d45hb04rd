@@ -36,17 +36,21 @@ const HomePage = () => {
   const open = Boolean(anchorEl);
   const [cupsDrank, setCupsDrank] = useState(0);
   const [waterGoal, setWaterGoal] = useState(0);
+  const [caloriesBurned, setCaloriesBurned] = useState(0);
+  const [caloriesGoal, setCaloriesGoal] = useState(0);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    fetchWaterData(); // Call the separate function to fetch water data on mount
+    fetchUserData(); // Fetch water and calories data on mount
   }, []);
 
-  const fetchWaterData = async () => {
+  const fetchUserData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${BASE_URL}/api/userinfo/water-data`, {
+
+      // Fetch water data
+      const waterResponse = await fetch(`${BASE_URL}/api/userinfo/water-data`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -54,22 +58,38 @@ const HomePage = () => {
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Water data fetched successfully:", data); // Log fetched data
-        setCupsDrank(data.waterDrank || 0); // Update this line
-        setWaterGoal(data.waterGoal || 0);
+      if (waterResponse.ok) {
+        const waterData = await waterResponse.json();
+        setCupsDrank(waterData.waterDrank || 0);
+        setWaterGoal(waterData.waterGoal || 0);
+      } else {
+        console.error("Failed to fetch water data:", waterResponse.statusText);
+      }
+
+      // Fetch calories data
+      const caloriesResponse = await fetch(
+        `${BASE_URL}/api/userinfo/calories-data`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (caloriesResponse.ok) {
+        const caloriesData = await caloriesResponse.json();
+        setCaloriesBurned(caloriesData.caloriesBurned || 0);
+        setCaloriesGoal(caloriesData.caloriesToBurn || 0);
       } else {
         console.error(
-          "Failed to fetch water data:",
-          response.status,
-          response.statusText
+          "Failed to fetch calories data:",
+          caloriesResponse.statusText
         );
-        const errorData = await response.json();
-        console.error("Error details:", errorData); // Log error details
       }
     } catch (err) {
-      console.error("An error occurred while fetching water data:", err);
+      console.error("An error occurred while fetching user data:", err);
     }
   };
 
@@ -107,7 +127,7 @@ const HomePage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setCupsDrank(data.newCupsDrank || cupsDrank + 1); // Increment cupsDrank directly
+        setCupsDrank(data.newCupsDrank || cupsDrank + 1);
       } else {
         console.error("Failed to increment cups:", response.statusText);
       }
@@ -137,16 +157,6 @@ const HomePage = () => {
             boxSizing: "border-box",
             backgroundColor: "#388e3c",
             color: "#fff",
-          },
-          [theme.breakpoints.down("sm")]: {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "auto",
-            padding: "16px",
-            backgroundColor: "#388e3c",
-            boxShadow: "none",
           },
         }}
       >
@@ -246,9 +256,11 @@ const HomePage = () => {
               gradient: "linear-gradient(135deg, #ffcc80, #fb8c00)",
             },
             {
-              title: "Calories",
-              value: "Under",
-              progress: null,
+              title: "Calories Burned",
+              value: `${caloriesBurned} / ${caloriesGoal}`,
+              progress: caloriesGoal
+                ? (caloriesBurned / caloriesGoal) * 100
+                : 0,
               color: "#ffebee",
               gradient: "linear-gradient(135deg, #ef9a9a, #d32f2f)",
             },
@@ -279,15 +291,10 @@ const HomePage = () => {
 
         <Button
           variant="contained"
+          sx={{ marginTop: 2, backgroundColor: "#388e3c" }}
           onClick={incrementCups}
-          sx={{
-            mt: 3,
-            backgroundColor: "#388e3c",
-            color: "#fff",
-            "&:hover": { backgroundColor: "#66bb6a" },
-          }}
         >
-          Add a Cup of Water
+          Add a Cup
         </Button>
       </Box>
     </Box>
