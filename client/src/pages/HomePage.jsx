@@ -118,7 +118,7 @@ const HomePage = () => {
 
   const sidebarItems = [
     { text: "Home", icon: <Home />, path: "/" },
-    { text: "Activity", icon: <FitnessCenter />, path: "/activity" },
+    { text: "Activity", icon: <FitnessCenter />, path: "/exercise-form" },
     { text: "Settings", icon: <Settings />, path: "/settings" },
     { text: "Logout", icon: <Lock />, action: handleLogout },
   ];

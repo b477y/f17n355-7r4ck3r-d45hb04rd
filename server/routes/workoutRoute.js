@@ -14,18 +14,20 @@ import { protect } from "../middleware/authmiddleware.js";
 
 const router = express.Router();
 
-router.post("/create", protect, allowedTo("user"), createWorkout); // Changed allowedTo to 'user'
-router.delete("/delete/:workoutId", protect, allowedTo("user"), deleteWorkout); // Changed allowedTo to 'user'
-router.get("/getAll", protect, allowedTo("admin"), getAllWorkouts);
-router.put("/update/:workoutId", protect, allowedTo("user"), updateWorkout); // Changed allowedTo to 'user'
-router.post("/:workoutId", protect, allowedTo("user"), addWorkoutForUser);
-router.get("/:userId", protect, allowedTo("user"), getUserWorkouts);
-router.delete("/:userId", protect, allowedTo("user"), deleteUserWorkout);
+// Change the route from '/create' to '/' for easier access
+// router.post("/", protect, allowedTo("user"), createWorkout); // Endpoint to create a workout
+router.post("/", protect, createWorkout); // Endpoint to create a workout
+router.delete("/:workoutId", protect, allowedTo("user"), deleteWorkout); // Endpoint to delete a workout
+router.get("/getAll", protect, allowedTo("admin"), getAllWorkouts); // Endpoint to get all workouts
+router.put("/:workoutId", protect, allowedTo("user"), updateWorkout); // Endpoint to update a workout
+router.post("/:workoutId", protect, allowedTo("user"), addWorkoutForUser); // Endpoint to add a workout for a user
+router.get("/:userId", protect, allowedTo("user"), getUserWorkouts); // Endpoint to get user workouts
+router.delete("/:userId", protect, allowedTo("user"), deleteUserWorkout); // Endpoint to delete user workout
 router.put(
   "/complete/:workoutId/:exerciseId",
   protect,
   allowedTo("user"),
-  completeExercise
-); // New route for completing exercises
+  completeExercise // New route for completing exercises
+);
 
 export default router;

@@ -1,27 +1,29 @@
 import User from "../models/userModel.js";
-import mongoose from "mongoose";
+import UserInfo from "../models/userInfo.js";
 import Workout from "../models/workoutModel.js";
 import ApiError from "../utils/ApiError.js";
 
-// User can create a workout with exercises
+// Utility function for sending responses
+const sendResponse = (res, statusCode, message, data = null) => {
+  return res.status(statusCode).json({ message, data });
+};
+
 export const createWorkout = async (req, res, next) => {
   try {
     const { exercises } = req.body;
     const user = req.user._id;
 
-    if (
-      !user ||
-      !exercises ||
-      !Array.isArray(exercises) ||
-      exercises.length === 0
-    ) {
-      return res
-        .status(400)
-        .json({ message: "User ID and exercises are required." });
+    // Validate input
+    if (!user || !Array.isArray(exercises) || exercises.length === 0) {
+      return sendResponse(
+        res,
+        400,
+        "User ID and a non-empty array of exercises are required."
+      );
     }
 
     const totalCaloriesBurned = exercises.reduce(
-      (total, exercise) => total + exercise.caloriesBurned,
+      (total, exercise) => total + (exercise.caloriesBurned || 0),
       0
     );
 
@@ -32,12 +34,24 @@ export const createWorkout = async (req, res, next) => {
       date: new Date(),
     });
 
+    // Save the new workout
     const savedWorkout = await newWorkout.save();
-    return res
-      .status(201)
-      .json({ message: "Workout created successfully", workout: savedWorkout });
+
+    // Update the user document
+    await User.findByIdAndUpdate(user, {
+      $push: { workouts: savedWorkout._id }, // Add workout ID to user's workouts array
+    });
+
+    // Update the UserInfo document (if you have a UserInfo model)
+    await UserInfo.findOneAndUpdate(
+      { user }, // Find the UserInfo document based on the user ID
+      { $inc: { caloriesBurned: totalCaloriesBurned } } // Increment caloriesBurned
+    );
+
+    return sendResponse(res, 201, "Workout created successfully", savedWorkout);
   } catch (error) {
-    return res.status(500).json({ message: "Server error", error });
+    console.error("Error creating workout:", error);
+    return next(new ApiError("Server error while creating workout", 500));
   }
 };
 
@@ -46,30 +60,34 @@ export const deleteWorkout = async (req, res, next) => {
   const workoutId = req.params.workoutId;
 
   if (!workoutId) {
-    return res.status(400).json({ message: "Workout ID is required." });
+    return sendResponse(res, 400, "Workout ID is required.");
   }
 
   try {
     const workout = await Workout.findById(workoutId);
 
     if (!workout) {
-      return res.status(404).json({ message: "Workout not found." });
+      return sendResponse(res, 404, "Workout not found.");
     }
 
     await Workout.findByIdAndDelete(workoutId);
-    res.status(200).json({ message: "Workout deleted successfully" });
+    return sendResponse(res, 200, "Workout deleted successfully");
   } catch (error) {
-    return next(new ApiError(`Error deleting workout`, 400));
+    console.error("Error deleting workout:", error);
+    return next(new ApiError("Server error while deleting workout", 500));
   }
 };
 
 // Admin can get all workouts
 export const getAllWorkouts = async (req, res, next) => {
   try {
-    const workouts = await Workout.find().populate("user", "username email");
-    res.status(200).json({ workouts });
+    const workouts = await Workout.find()
+      .populate("user", "username email")
+      .lean();
+    return sendResponse(res, 200, "Fetched all workouts", workouts);
   } catch (error) {
-    return next(new ApiError(`Error fetching workouts: ${error}`, 400));
+    console.error("Error fetching workouts:", error);
+    return next(new ApiError("Server error while fetching workouts", 500));
   }
 };
 
@@ -82,26 +100,27 @@ export const updateWorkout = async (req, res, next) => {
     const workout = await Workout.findById(workoutId);
 
     if (!workout) {
-      return res.status(404).json({ message: "Workout not found." });
+      return sendResponse(res, 404, "Workout not found.");
     }
 
     if (exercises) {
       workout.exercises = exercises;
       workout.totalCaloriesBurned = exercises.reduce(
-        (total, exercise) => total + exercise.caloriesBurned,
+        (total, exercise) => total + (exercise.caloriesBurned || 0),
         0
       );
     }
 
     const updatedWorkout = await workout.save();
-    res
-      .status(200)
-      .json({
-        message: "Workout updated successfully",
-        workout: updatedWorkout,
-      });
+    return sendResponse(
+      res,
+      200,
+      "Workout updated successfully",
+      updatedWorkout
+    );
   } catch (error) {
-    return next(new ApiError(`Error updating workout: ${error}`, 400));
+    console.error("Error updating workout:", error);
+    return next(new ApiError("Server error while updating workout", 500));
   }
 };
 
@@ -111,12 +130,12 @@ export const addWorkoutForUser = async (req, res, next) => {
   const existingWorkoutId = req.params.workoutId;
 
   try {
-    const existingWorkout = await Workout.findById(existingWorkoutId).populate(
-      "user",
-      "name email"
-    );
+    const existingWorkout = await Workout.findById(existingWorkoutId)
+      .populate("user", "name email")
+      .lean();
+
     if (!existingWorkout) {
-      return next(new ApiError(`Existing workout not found`, 400));
+      return next(new ApiError("Existing workout not found", 404));
     }
 
     const newWorkout = new Workout({
@@ -127,12 +146,10 @@ export const addWorkoutForUser = async (req, res, next) => {
     });
 
     const savedWorkout = await newWorkout.save();
-    return res.json({
-      message: "Workout added successfully",
-      workout: savedWorkout,
-    });
+    return sendResponse(res, 201, "Workout added successfully", savedWorkout);
   } catch (error) {
-    return next(new ApiError(`Error adding workout: ${error}`, 400));
+    console.error("Error adding workout:", error);
+    return next(new ApiError("Server error while adding workout", 500));
   }
 };
 
@@ -140,10 +157,23 @@ export const addWorkoutForUser = async (req, res, next) => {
 export const getUserWorkouts = async (req, res, next) => {
   const userId = req.params.userId;
   try {
-    const userWithWorkouts = await User.findById(userId).populate("workouts");
-    return res.json(userWithWorkouts.workouts);
+    const userWithWorkouts = await User.findById(userId)
+      .populate("workouts")
+      .lean();
+
+    if (!userWithWorkouts) {
+      return next(new ApiError("User not found", 404));
+    }
+
+    return sendResponse(
+      res,
+      200,
+      "Fetched user workouts",
+      userWithWorkouts.workouts
+    );
   } catch (error) {
-    return next(new ApiError(`Error fetching user workouts: ${error}`, 400));
+    console.error("Error fetching user workouts:", error);
+    return next(new ApiError("Server error while fetching user workouts", 500));
   }
 };
 
@@ -155,21 +185,22 @@ export const deleteUserWorkout = async (req, res, next) => {
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return next(new ApiError(`User not found`, 400));
+      return next(new ApiError("User not found", 404));
     }
 
     const deletedWorkout = await Workout.findByIdAndDelete(workoutId);
     if (!deletedWorkout) {
-      return next(new ApiError(`Workout not found`, 400));
+      return next(new ApiError("Workout not found", 404));
     }
 
     user.workouts = user.workouts.filter(
       (id) => id.toString() !== workoutId.toString()
     );
     await user.save();
-    return res.status(201).json({ message: "Workout deleted successfully" });
+    return sendResponse(res, 200, "Workout deleted successfully");
   } catch (error) {
-    return next(new ApiError(`Error deleting workout`, 400));
+    console.error("Error deleting user workout:", error);
+    return next(new ApiError("Server error while deleting user workout", 500));
   }
 };
 
@@ -180,20 +211,20 @@ export const completeExercise = async (req, res, next) => {
   try {
     const workout = await Workout.findById(workoutId);
     if (!workout) {
-      return res.status(404).json({ message: "Workout not found." });
+      return sendResponse(res, 404, "Workout not found.");
     }
 
     const exercise = workout.exercises.id(exerciseId);
     if (!exercise) {
-      return res.status(404).json({ message: "Exercise not found." });
+      return sendResponse(res, 404, "Exercise not found.");
     }
 
     exercise.completed = true; // Mark exercise as completed
-    workout.totalCaloriesBurned += exercise.caloriesBurned; // Update total calories burned
     await workout.save();
 
-    res.status(200).json({ message: "Exercise marked as completed", workout });
+    return sendResponse(res, 200, "Exercise marked as completed", workout);
   } catch (error) {
-    return next(new ApiError(`Error completing exercise: ${error}`, 400));
+    console.error("Error completing exercise:", error);
+    return next(new ApiError("Server error while completing exercise", 500));
   }
 };
