@@ -14,7 +14,6 @@ const userSchema = mongoose.Schema(
       unique: true,
       lowercase: true,
     },
-    passwordChangedAt: Date,
     passwordResetCode: String,
     passwordResetExpires: String,
     passwordResetVerified: Boolean
